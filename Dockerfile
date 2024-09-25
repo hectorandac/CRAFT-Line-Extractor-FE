@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install only production dependencies to reduce image size
-RUN npm install --only=production
+RUN npm install
 
 # Pass environment variables at build time
 ARG NEXT_PUBLIC_API_URL
@@ -26,7 +26,7 @@ FROM node:18-slim
 # Set the working directory
 WORKDIR /app
 
-# Copy over only the production dependencies and the build output
+# Copy over the built output and production dependencies only
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
