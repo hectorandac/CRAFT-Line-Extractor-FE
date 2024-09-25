@@ -10,6 +10,10 @@ COPY package*.json ./
 # Install only production dependencies to reduce image size
 RUN npm install --only=production
 
+# Pass environment variables at build time
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # Copy the rest of the application code to the container
 COPY . .
 

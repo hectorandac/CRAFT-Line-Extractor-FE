@@ -41,7 +41,7 @@ export default function Home() {
     );
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/process_image`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/process_image`, {
         method: "POST",
         body: formData,
       });
