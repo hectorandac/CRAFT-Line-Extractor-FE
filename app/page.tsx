@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { FaFileUpload, FaSpinner, FaCopy } from "react-icons/fa";
-import Image from "next/image"
+import Image from "next/image";
 
 interface BoundingBox {
   x_min: number;
@@ -102,7 +102,7 @@ export default function Home() {
           </div>
         )}
 
-        <div className="flex flex-row items-center gap-12 w-full">
+        <div className="flex flex-col items-center gap-12 w-full">
           {imageDataUrl && !loading && (
             <div className="relative p-6 bg-white rounded-lg shadow-lg w-full max-w-2xl min-h-[750px]">
               <Image
@@ -113,85 +113,85 @@ export default function Home() {
                 className="w-full h-auto"
                 ref={imgRef}
               />
-            <svg
-              ref={svgRef}
-              className="absolute top-0 left-0 w-full h-full"
-            >
-              {boundingBoxes.map(({ bounding_boxes, line }, index) => {
-                const sortedBoxes = bounding_boxes.sort((a, b) => a.x_min - b.x_min);
-                const firstBox = sortedBoxes[0];
-                const lastBox = sortedBoxes[sortedBoxes.length - 1];
+              <svg
+                ref={svgRef}
+                className="absolute top-0 left-0 w-full h-full"
+              >
+                {boundingBoxes.map(({ bounding_boxes, line }, index) => {
+                  const sortedBoxes = bounding_boxes.sort((a, b) => a.x_min - b.x_min);
+                  const firstBox = sortedBoxes[0];
+                  const lastBox = sortedBoxes[sortedBoxes.length - 1];
 
-                // Coordinates for the polygon: top-left of first word, top-right of last word,
-                // bottom-right of last word, bottom-left of first word
-                const points = [
-                  `${(firstBox.x_min * scalingFactor.widthScale) + 24},${(firstBox.y_min * scalingFactor.heightScale) + 24}`,
-                  `${(lastBox.x_max * scalingFactor.widthScale) + 24},${(lastBox.y_min * scalingFactor.heightScale) + 24}`,
-                  `${(lastBox.x_max * scalingFactor.widthScale) + 24},${(lastBox.y_max * scalingFactor.heightScale) + 24}`,
-                  `${(firstBox.x_min * scalingFactor.widthScale) + 24},${(firstBox.y_max * scalingFactor.heightScale) + 24}`,
-                ].join(" ");
+                  const points = [
+                    `${(firstBox.x_min * scalingFactor.widthScale) + 24},${(firstBox.y_min * scalingFactor.heightScale) + 24}`,
+                    `${(lastBox.x_max * scalingFactor.widthScale) + 24},${(lastBox.y_min * scalingFactor.heightScale) + 24}`,
+                    `${(lastBox.x_max * scalingFactor.widthScale) + 24},${(lastBox.y_max * scalingFactor.heightScale) + 24}`,
+                    `${(firstBox.x_min * scalingFactor.widthScale) + 24},${(firstBox.y_max * scalingFactor.heightScale) + 24}`,
+                  ].join(" ");
 
-                return (
-                  <polygon
-                    key={index}
-                    points={points}
-                    fill="transparent"
-                    stroke="red"
-                    strokeWidth="2"
-                    className="hover-stroke"
-                    onMouseOver={(e) => {
-                      setHoveredLine({ line, x: firstBox.x_min * scalingFactor.widthScale, y: firstBox.y_min * scalingFactor.heightScale });
-                      e.currentTarget.setAttribute("stroke", "blue");
-                      e.currentTarget.setAttribute("stroke-width", "4");
-                    }}
-                    onMouseLeave={(e) => {
-                      setHoveredLine(null);
-                      e.currentTarget.setAttribute("stroke", "red");
-                      e.currentTarget.setAttribute("stroke-width", "2");
-                    }}
-                  />
-                );
-              })}
+                  return (
+                    <polygon
+                      key={index}
+                      points={points}
+                      fill="transparent"
+                      stroke="red"
+                      strokeWidth="2"
+                      className="hover-stroke"
+                      onMouseOver={(e) => {
+                        setHoveredLine({ line, x: firstBox.x_min * scalingFactor.widthScale, y: firstBox.y_min * scalingFactor.heightScale });
+                        e.currentTarget.setAttribute("stroke", "blue");
+                        e.currentTarget.setAttribute("stroke-width", "4");
+                      }}
+                      onMouseLeave={(e) => {
+                        setHoveredLine(null);
+                        e.currentTarget.setAttribute("stroke", "red");
+                        e.currentTarget.setAttribute("stroke-width", "2");
+                      }}
+                    />
+                  );
+                })}
 
-              {hoveredLine !== null && (
-                <>
-                  <rect
-                    x={hoveredLine.x + 24}  // Positioning it near the top-left of the bounding box
-                    y={hoveredLine.y -6}
-                    width="100"
-                    height="30"
-                    fill="white"
-                    stroke="black"
-                    strokeWidth="1"
-                  />
-                  <text
-                    x={hoveredLine.x + 30}
-                    y={hoveredLine.y + 14}
-                    fill="black"
-                    fontSize="16"
-                    fontWeight="bold"
-                  >
-                    Line {hoveredLine.line}
-                  </text>
-                </>
-              )}
-            </svg>
+                {hoveredLine !== null && (
+                  <>
+                    <rect
+                      x={hoveredLine.x + 24}  // Positioning it near the top-left of the bounding box
+                      y={hoveredLine.y - 6}
+                      width="100"
+                      height="30"
+                      fill="white"
+                      stroke="black"
+                      strokeWidth="1"
+                    />
+                    <text
+                      x={hoveredLine.x + 30}
+                      y={hoveredLine.y + 14}
+                      fill="black"
+                      fontSize="16"
+                      fontWeight="bold"
+                    >
+                      Line {hoveredLine.line}
+                    </text>
+                  </>
+                )}
+              </svg>
             </div>
           )}
 
-          <div className="p-6 bg-gray-900 text-white rounded-lg shadow-lg w-full max-w-2xl min-h-[750px] overflow-auto">
-            <h3 className="text-2xl font-medium mb-6">Bounding Box Data (JSON)</h3>
-            <pre className="overflow-auto max-h-[1020px] text-lg">
-              {JSON.stringify(boundingBoxes, null, 2)}
-            </pre>
-            <button
-              onClick={handleCopy}
-              className="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg mt-6 text-xl"
-            >
-              <FaCopy className="text-2xl" />
-              {copied ? "Copied!" : "Copy JSON"}
-            </button>
-          </div>
+          {boundingBoxes.length > 0 && (
+            <div className="p-6 bg-gray-900 text-white rounded-lg shadow-lg w-full max-w-2xl min-h-[300px] overflow-auto">
+              <h3 className="text-2xl font-medium mb-6">Bounding Box Data (JSON)</h3>
+              <pre className="overflow-auto max-h-[1020px] text-lg">
+                {JSON.stringify(boundingBoxes, null, 2)}
+              </pre>
+              <button
+                onClick={handleCopy}
+                className="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg mt-6 text-xl"
+              >
+                <FaCopy className="text-2xl" />
+                {copied ? "Copied!" : "Copy JSON"}
+              </button>
+            </div>
+          )}
         </div>
       </main>
     </div>
